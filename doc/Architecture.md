@@ -1,122 +1,40 @@
-# Architecture: Snort–Splunk IDS Integration
+# Architecture: Snort-Splunk IDS Integration
 
-This document describes the architecture of the Snort–Splunk IDS pipeline, including all systems involved, their roles, and the complete data flow from detection to visualization. The structure matches the format used in the Master Playbook.
-
----
-
-## 1. Environment Summary
-
-The project environment consists of four systems working together to detect, forward, index, and analyze intrusion detection alerts.
-
-* Snort IDS on Ubuntu Server 24.04
-* Splunk Universal Forwarder on Ubuntu Server 24.04
-* Splunk Enterprise (Indexer + Search Head) on Windows 11 (host machine)
-* Kali Linux attacker machine in VirtualBox
-
-Ubuntu Server and Kali Linux both run inside VirtualBox. Windows 11 hosts Splunk Enterprise.
+This document outlines the logical and physical architecture of the deployed Intrusion Detection System (IDS) and log analysis platform.
 
 ---
 
-## 2. System Components and Roles
+## 1. High-Level System Diagram
 
-### 2.1 Snort IDS (Ubuntu Server 24.04)
+The system operates as a classic three-tiered structure: **Attacker**, **IDS/Forwarder**, and **Indexer/Analyzer**.
 
-* Performs network intrusion detection.
-* Applies custom rules to inspect traffic.
-* Generates alerts in fast format.
-* Stores alerts at:
 
-  ```
-  /var/log/snort/alert.log
-  ```
-* Alerts are consumed by the Splunk Universal Forwarder.
-
-### 2.2 Splunk Universal Forwarder (Ubuntu Server 24.04)
-
-* Monitors Snort's alert.log file.
-* Forwards alerts to Splunk Enterprise over port 9997.
-* Uses two configurations:
-
-  * `inputs.conf` for file monitoring
-  * `outputs.conf` for forwarding rules
-
-### 2.3 Splunk Enterprise (Windows 11)
-
-* Acts as the indexing and searching layer.
-* Receives logs and stores them under the chosen index.
-* Provides dashboards, analytics, and SPL search functionality.
-
-### 2.4 Kali Linux (VirtualBox)
-
-* Used to simulate real-world attacks.
-* Generates port scans, brute force attempts, and custom traffic.
-* Sends traffic directly to Ubuntu Snort machine.
 
 ---
 
-## 3. Network Architecture
+## 2. Component Roles and Interaction
 
-### 3.1 Virtualization Layout
+### A. The Snort Host (Intrusion Detection)
 
-* Windows 11 serves as the host operating system.
-* VirtualBox runs:
+* **Host:** Ubuntu Server (`SNORT_HOST_IP`)
+* **Component:** **Snort**
+    * **Role:** Performs real-time packet inspection against a set of predefined and custom rules (e.g., SID 1000015 for port scans).
+    * **Function:** Generates alerts for suspicious network activity and writes them to the specified log file (`/var/log/snort/alert.log`) in the `alert_fast` format.
+* **Component:** **Splunk Universal Forwarder (UF)**
+    * **Role:** Acts as the log collection agent.
+    * **Function:** Continuously monitors the Snort alert file (`inputs.conf`) and securely transmits (forwards) the data via TCP on port 9997 (`outputs.conf`) to the Splunk Indexer.
 
-  * Ubuntu Server 24.04 (Snort + Splunk Forwarder)
-  * Kali Linux (Attacker)
-* All machines share the same VirtualBox network.
+### B. The Splunk Indexer (Centralized Analysis)
 
-### 3.2 Network Communication Overview
+* **Host:** Windows 11 Host (`SPLUNK_INDEXER_IP`)
+* **Component:** **Splunk Enterprise** (Indexer and Search Head combined)
+    * **Role:** Data ingestion, indexing, storage, and analysis.
+    * **Function:**
+        1.  **Ingestion:** Listens on port **9997** to receive data from the UF.
+        2.  **Indexing:** Stores the raw Snort log data, assigning metadata like `sourcetype=snort_alert_fast` and `index=main`.
+        3.  **Analysis:** Allows security analysts to query the indexed data using the Splunk Search Processing Language (SPL) to create visualizations, reports, and dashboards.
 
-* Kali sends network traffic to Ubuntu Server.
-* Snort inspects packets and logs alerts.
-* Splunk Forwarder forwards alert data to Splunk Enterprise.
-* Splunk Enterprise indexes and displays the data.
+### C. External Hosts
 
----
-
-## 4. Data Flow Architecture
-
-The following flow represents how attack events travel through the system:
-
-```
-[ Kali Linux Attacker ]
-            |
-            v
-[ Ubuntu Server - Snort IDS ]
-  - Generates /var/log/snort/alert.log
-            |
-            v
-[ Splunk Universal Forwarder ]
-  - Monitors alert.log
-  - Sends data to Indexer over 9997
-            |
-            v
-[ Splunk Enterprise (Windows 11) ]
-  - Receives and indexes events
-  - Dashboards and searches show Snort alerts
-```
-
----
-
-## 5. Logical Architecture Summary
-
-| Layer            | Component                  | Description                            |
-| ---------------- | -------------------------- | -------------------------------------- |
-| Detection Layer  | Snort IDS                  | Detects attacks, generates alerts      |
-| Forwarding Layer | Splunk Universal Forwarder | Sends alerts to Indexer                |
-| Indexing Layer   | Splunk Enterprise          | Stores and processes the events        |
-| Analysis Layer   | Splunk Search/Dashboards   | Visualizes and analyzes intrusion data |
-
----
-
-## 6. Architecture Goals
-
-* Provide a complete IDS pipeline from detection to visualization.
-* Use real attack traffic for realistic testing.
-* Maintain clear separation between detection, forwarding, indexing, and analysis layers.
-* Allow dashboards to display meaningful threat intelligence.
-
----
-
-End of Architecture Document.
-
+* **Attacker Host (Kali Linux):** Used to generate malicious traffic (e.g., Nmap scans, brute-force attempts) to test the efficacy of the Snort ruleset and the end-to-end integration pipeline.
+* **Internal Network (`HOME\_NET`):** The protected network segment (e.g., `192.168.1.0/24`) that Snort is deployed to monitor and defend.
