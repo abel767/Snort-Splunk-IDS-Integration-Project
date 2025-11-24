@@ -89,7 +89,7 @@ This guide provides step-by-step instructions for setting up the environment, fo
 
 ---
 
-### 3. 🧪 Validation (On Attacker Host and Splunk)
+### 3. Validation (On Attacker Host and Splunk)
 
 1.  **Generate Test Traffic (On Kali Linux):**
     Use the attacker machine to trigger the Snort rules.
