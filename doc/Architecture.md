@@ -8,8 +8,7 @@ This document outlines the logical and physical architecture of the deployed Int
 
 The system operates as a classic three-tiered structure: **Attacker**, **IDS/Forwarder**, and **Indexer/Analyzer**.
 
-
-
+<img src="https://github.com/abel767/Snort-Splunk-IDS-Integration-Project/blob/da8a23242709112b3b57354d354b45e207767903/Images/Snort-Splunk.drawio.png"/>
 ---
 
 ## 2. Component Roles and Interaction
