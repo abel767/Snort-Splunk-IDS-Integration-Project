@@ -21,8 +21,8 @@ The solution operates within a private, bridged network where all hosts can comm
 
 | Host Role | Placeholder IP |
 | :--- | :--- |
-| **Snort Host / UF** | `$$SNORT_HOST_IP$$` |
-| **Splunk Indexer** | `$$SPLUNK_INDEXER_IP$$` |
+| **Snort Host / UF** | `SNORT_HOST_IP` |
+| **Splunk Indexer** | `SPLUNK_INDEXER_IP` |
 | **Network Range** | `192.168.1.0/24` (Example HOME_NET) |
 
 ### Documentation Structure
