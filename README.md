@@ -12,7 +12,7 @@ The system is designed to detect and alert on common attack vectors, such as **p
 | :--- | :--- | :--- |
 | **Snort IDS** | Network Intrusion Detection and Alerting | Ubuntu Server (Virtual Machine) |
 | **Splunk Universal Forwarder (UF)** | Agent to collect and forward Snort logs | Ubuntu Server (Virtual Machine) |
-| **Splunk Enterprise** | Log Indexing, Analysis, and Visualization | Host Operating System (e.g., Windows 11) |
+| **Splunk Enterprise** | Log Indexing, Analysis, and Visualization | Host Operating System (Windows 11) |
 | **Attacker Host** | Used for testing custom detection rules | Kali Linux (Virtual Machine) |
 
 ### Network Environment
