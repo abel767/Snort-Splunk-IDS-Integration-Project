@@ -162,5 +162,23 @@ index=main sourcetype=snort_alert_fast
 
 **(This query is further detailed in SPL_Queries.md)**
 
+---
+
+### Phase 5: Final Splunk Actions (Dashboard Creation)
+
+This phase documents the final steps necessary to make the analysis permanent and easily accessible via a **Splunk Dashboard**.
+
+#### 1. Save Visualization as Dashboard Panel
+
+This action converts the successful search into a permanent monitoring widget, creating the foundation for a Security Operations Center (SOC) dashboard.
+
+| Action | Steps in Splunk GUI | Notes |
+| :--- | :--- | :--- |
+| **Save Search** | 1. Click **'Save As'** > **'Dashboard Panel'** on the search results page. | Saves the current SPL query and visualization settings. |
+| **Name Panel** | Name the panel (e.g., **'Snort IDS Attack Overview'**). | Descriptive name for the widget. |
+| **Select Dashboard** | Select **'New Dashboard'** (e.g., **'Snort IDS Monitor'**). | Creates the new dashboard instance. |
+| **Finalize** | Select **'Pie Chart'** visualization type. | Saves the panel using the **Pie Chart** visualization you created. |
+
+<img src="https://github.com/abel767/Snort-Splunk-IDS-Integration-Project/blob/8be929b259d99109431311fa051a9a0467033818/Images/splunk/dashboard.png" width="600" height="350">
 
 
