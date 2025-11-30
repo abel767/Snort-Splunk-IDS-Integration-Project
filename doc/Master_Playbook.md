@@ -98,6 +98,7 @@ The following Nmap SYN scan was used to target the Snort Host ($$SNORT\_HOST\_IP
 # Command executed from Kali Linux 
 sudo nmap -sS -p 1-1000 $$SNORT_HOST_IP$$
 ```
+
 #### 2. Simulate SSH Brute Force (Triggers SID 1000012)
 The Hydra tool was used to attempt rapid, failed SSH logins, triggering the protocol-aware brute force detection rule.
 
