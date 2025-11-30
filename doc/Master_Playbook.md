@@ -41,7 +41,7 @@ sudo snort -D -c /etc/snort/snort.conf -i enp0s3
 ### Phase 2: Splunk Universal Forwarder (UF) Setup
 This phase involves installing the UF on the Snort Host and configuring it to send the Snort log file to the Splunk Indexer (SPLUNK_INDEXER_IP).
 
-#### 4. UF Installation and Startup
+#### 1. UF Installation and Startup
 ```bash
 # 1. Install UF package (assuming the .deb file is downloaded in the current directory)
 sudo dpkg -i splunkforwarder.deb
@@ -50,7 +50,7 @@ sudo dpkg -i splunkforwarder.deb
 sudo /opt/splunkforwarder/bin/splunk start --accept-license
 ```
 
-#### 5. Configure Forwarding (outputs.conf)
+#### 2. Configure Forwarding (outputs.conf)
 This configuration directs all forwarded data to the Splunk Indexer over port 9997.
 ```Bash
 # Edit or create the outputs.conf file
@@ -66,7 +66,7 @@ defaultGroup = default-autolb-group
 server = $$SPLUNK_INDEXER_IP$$:9997
 ```
 
-#### 6. Configure Monitoring (inputs.conf)
+#### 3. Configure Monitoring (inputs.conf)
 This configuration instructs the UF to monitor the Snort alert log file and assign the correct metadata.
 ```Bash
 # Edit or create the inputs.conf file
@@ -83,16 +83,35 @@ index = main
 
 **Note: Ensure the snort_alert_fast sourcetype is defined or accepted by your Splunk Indexer.**
 
-#### 7. Final UF Restart
+#### 4. Final UF Restart
 A restart is necessary to apply the new forwarding and monitoring configurations.
 ```bash
 sudo /opt/splunkforwarder/bin/splunk restart
 ```
 
-### Phase 3: Validation and Final Splunk Analysis
+### Phase 3: Attack Simulation (Kali Linux)
+These commands were executed from the Attacker Host (Kali Linux) to verify that the custom Snort rules (SID 1000015 and SID 1000012) were successfully triggered.
+
+#### 1. Simulate Rapid Port Scan (Triggers SID 1000015)
+The following Nmap SYN scan was used to target the Snort Host ($$SNORT\_HOST\_IP$$) and trigger the rate-limiting port scan detection rule.
+```bash
+# Command executed from Kali Linux 
+sudo nmap -sS -p 1-1000 $$SNORT_HOST_IP$$
+```
+#### 2. Simulate SSH Brute Force (Triggers SID 1000012)
+The Hydra tool was used to attempt rapid, failed SSH logins, triggering the protocol-aware brute force detection rule.
+
+```bash
+# Command executed from Kali Linux
+sudo hydra -L users.txt -P passwords.txt -t 16 $$SNORT_HOST_IP$$ ssh
+```
+
+
+
+### Phase 4: Validation and Final Splunk Analysis
 After confirming that the Splunk Indexer is receiving data (via listening on port 9997), the final step is to analyze the data.
 
-#### 8. Final SPL Query for Dashboard Visualization
+#### 1. Final SPL Query for Dashboard Visualization
 This robust Splunk Search Language (SPL) query extracts relevant fields from the Snort logs, maps Signature IDs to human-readable names, and calculates attack statistics.
 ```Bash
 index=main sourcetype=snort_alert_fast
